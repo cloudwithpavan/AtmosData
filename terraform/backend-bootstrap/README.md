@@ -1,5 +1,29 @@
-# Terraform state bucket bootstrap
 
-Create a globally unique GCS bucket for Terraform state in a separate one-time bootstrap configuration, then configure the main Terraform backend and run `terraform init -migrate-state`.
+# AtmosData - Terraform Backend Bootstrap
 
-Do not configure the main backend to use a bucket that the same main state is responsible for creating. Keep state bucket separate from the raw weather bucket. Enable object versioning and uniform bucket-level access on the state bucket. Restrict access to the deployment identity.
+This configuration creates a dedicated Google Cloud Storage bucket
+for storing Terraform remote state.
+
+## State Bucket
+
+atmosdata-tfstate-dev-802327721598
+
+## Purpose
+
+- Store Terraform state remotely.
+- Enable object versioning.
+- Enforce uniform bucket-level access.
+- Prevent public access.
+- Keep Terraform state separate from weather raw data.
+
+## Deployment
+
+Run from the repository root:
+
+```powershell
+terraform -chdir=terraform/backend-bootstrap init
+terraform -chdir=terraform/backend-bootstrap apply
+```
+
+The state bucket is created separately before configuring
+the main Terraform remote backend.
