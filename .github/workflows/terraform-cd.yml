@@ -1,3 +1,4 @@
+
 name: AtmosData Terraform CD
 
 on:
@@ -6,10 +7,15 @@ on:
 permissions:
   contents: read
   id-token: write
+  actions: read
 
 env:
   GCP_PROJECT_ID: my-project-77-511616
   GCP_REGION: asia-south1
+
+concurrency:
+  group: atmosdata-terraform-deployment
+  cancel-in-progress: false
 
 jobs:
   terraform-plan:
@@ -45,7 +51,7 @@ jobs:
         run: terraform -chdir=terraform fmt -check -recursive
 
       - name: Terraform Init
-        run: terraform -chdir=terraform init
+        run: terraform -chdir=terraform init -input=false
 
       - name: Terraform Validate
         run: terraform -chdir=terraform validate
@@ -54,6 +60,52 @@ jobs:
         run: |
           terraform -chdir=terraform plan \
             -input=false \
+            -out=tfplan \
             -var="project_id=${GCP_PROJECT_ID}" \
             -var="region=${GCP_REGION}" \
             -var="raw_bucket_name=${{ vars.ATMOSDATA_RAW_BUCKET_NAME }}"
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: atmosdata-terraform-plan
+          path: terraform/tfplan
+          retention-days: 1
+
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+
+    environment:
+      name: atmosdata-deployment
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: atmosdata-terraform-plan
+          path: terraform/
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform -chdir=terraform init -input=false
+
+      - name: Terraform Apply Approved Plan
+        run: terraform -chdir=terraform apply -input=false tfplan
