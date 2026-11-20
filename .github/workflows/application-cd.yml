@@ -1,15 +1,61 @@
+
 name: Application CD
+
 on:
   workflow_dispatch:
+
 permissions:
   contents: read
   id-token: write
+
+env:
+  GCP_PROJECT_ID: my-project-77-511616
+  GCP_REGION: asia-south1
+  FUNCTION_NAME: weather-ingestion
+  RUNTIME_SERVICE_ACCOUNT: atmosdata-functions@my-project-77-511616.iam.gserviceaccount.com
+  RAW_BUCKET_NAME: weatherpulse-raw-dev-802327721598
+  OPENWEATHER_SECRET_NAME: openweather-api-key
+
 jobs:
-  deploy-placeholder:
+  deploy-weather-ingestion:
+    name: Deploy Weather Ingestion Function
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Validate deployment configuration
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy Cloud Run Function
         run: |
-          echo "Deployment is intentionally gated until function deployment settings are finalized."
-          echo "Configure WIF, artifact registry, function names, runtime, and trigger after Phase 3."
+          gcloud functions deploy "$FUNCTION_NAME" \
+            --gen2 \
+            --project="$GCP_PROJECT_ID" \
+            --region="$GCP_REGION" \
+            --runtime=python311 \
+            --source=cloud_run_functions/weather_ingestion \
+            --entry-point=ingest_weather \
+            --trigger-http \
+            --no-allow-unauthenticated \
+            --service-account="$RUNTIME_SERVICE_ACCOUNT" \
+            --set-env-vars="GCP_PROJECT_ID=$GCP_PROJECT_ID,RAW_BUCKET_NAME=$RAW_BUCKET_NAME,OPENWEATHER_SECRET_NAME=$OPENWEATHER_SECRET_NAME" \
+            --memory=256MiB \
+            --timeout=120s \
+            --max-instances=3 \
+            --quiet
+
+      - name: Verify deployment
+        run: |
+          gcloud functions describe "$FUNCTION_NAME" \
+            --gen2 \
+            --project="$GCP_PROJECT_ID" \
+            --region="$GCP_REGION" \
+            --format="yaml(name,state,environment,serviceConfig.uri)"
