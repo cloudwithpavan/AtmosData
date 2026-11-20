@@ -14,13 +14,13 @@ variable "raw_bucket_name" {
 }
 
 variable "enable_cloud_sql" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Cloud SQL costs money while provisioned. Enable only after cost review."
 }
 
 variable "enable_composer" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Composer is expensive. Enable only after local DAG development and cost review."
 }
