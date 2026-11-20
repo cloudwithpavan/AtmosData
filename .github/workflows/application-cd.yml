@@ -11,10 +11,15 @@ permissions:
 env:
   GCP_PROJECT_ID: my-project-77-511616
   GCP_REGION: asia-south1
-  FUNCTION_NAME: weather-ingestion
+
   RUNTIME_SERVICE_ACCOUNT: atmosdata-functions@my-project-77-511616.iam.gserviceaccount.com
+  EVENTARC_TRIGGER_SERVICE_ACCOUNT: atmosdata-eventarc-trigger@my-project-77-511616.iam.gserviceaccount.com
+
   RAW_BUCKET_NAME: weatherpulse-raw-dev-802327721598
   OPENWEATHER_SECRET_NAME: openweather-api-key
+
+  BRONZE_DATASET: weather_bronze_dev
+  BRONZE_TABLE: weather_observations
 
 jobs:
   deploy-weather-ingestion:
@@ -34,9 +39,9 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy Cloud Run Function
+      - name: Deploy Weather Ingestion Function
         run: |
-          gcloud functions deploy "$FUNCTION_NAME" \
+          gcloud functions deploy weather-ingestion \
             --gen2 \
             --project="$GCP_PROJECT_ID" \
             --region="$GCP_REGION" \
@@ -52,10 +57,46 @@ jobs:
             --max-instances=3 \
             --quiet
 
-      - name: Verify deployment
+      - name: Verify Weather Ingestion
         run: |
-          gcloud functions describe "$FUNCTION_NAME" \
+          gcloud functions describe weather-ingestion \
             --gen2 \
             --project="$GCP_PROJECT_ID" \
             --region="$GCP_REGION" \
-            --format="yaml(name,state,environment,serviceConfig.uri)"
+            --format="yaml(name,state,serviceConfig.uri)"
+
+      - name: Deploy GCS to BigQuery Loader with Eventarc
+        run: |
+          gcloud functions deploy weather-gcs-to-bq \
+            --gen2 \
+            --project="$GCP_PROJECT_ID" \
+            --region="$GCP_REGION" \
+            --runtime=python311 \
+            --source=cloud_run_functions/gcs_to_bigquery \
+            --entry-point=load_gcs_to_bigquery \
+            --trigger-location="$GCP_REGION" \
+            --trigger-service-account="$EVENTARC_TRIGGER_SERVICE_ACCOUNT" \
+            --trigger-event-filters="type=google.cloud.storage.object.v1.finalized" \
+            --trigger-event-filters="bucket=$RAW_BUCKET_NAME" \
+            --service-account="$RUNTIME_SERVICE_ACCOUNT" \
+            --set-env-vars="GCP_PROJECT_ID=$GCP_PROJECT_ID,RAW_BUCKET_NAME=$RAW_BUCKET_NAME,BRONZE_DATASET=$BRONZE_DATASET,BRONZE_TABLE=$BRONZE_TABLE" \
+            --memory=256MiB \
+            --timeout=120s \
+            --max-instances=3 \
+            --quiet
+
+      - name: Grant Eventarc permission to invoke loader
+        run: |
+          gcloud run services add-iam-policy-binding weather-gcs-to-bq \
+            --project="$GCP_PROJECT_ID" \
+            --region="$GCP_REGION" \
+            --member="serviceAccount:$EVENTARC_TRIGGER_SERVICE_ACCOUNT" \
+            --role="roles/run.invoker"
+
+      - name: Verify GCS to BigQuery Loader and Eventarc
+        run: |
+          gcloud functions describe weather-gcs-to-bq \
+            --gen2 \
+            --project="$GCP_PROJECT_ID" \
+            --region="$GCP_REGION" \
+            --format="yaml(name,state,eventTrigger,serviceConfig.uri,serviceConfig.serviceAccountEmail)"
