@@ -1,0 +1,5 @@
+project_id      = "my-project-77-511616"
+region          = "asia-south1"
+raw_bucket_name = "weatherpulse-raw-dev-REPLACE-WITH-UNIQUE-SUFFIX"
+enable_cloud_sql = false
+enable_composer  = false

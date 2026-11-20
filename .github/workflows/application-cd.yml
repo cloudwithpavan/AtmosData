@@ -1,0 +1,15 @@
+name: Application CD
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  deploy-placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate deployment configuration
+        run: |
+          echo "Deployment is intentionally gated until function deployment settings are finalized."
+          echo "Configure WIF, artifact registry, function names, runtime, and trigger after Phase 3."
