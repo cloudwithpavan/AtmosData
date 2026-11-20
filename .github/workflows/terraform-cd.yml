@@ -53,5 +53,7 @@ jobs:
       - name: Terraform Plan
         run: |
           terraform -chdir=terraform plan \
+            -input=false \
             -var="project_id=${GCP_PROJECT_ID}" \
-            -var="region=${GCP_REGION}"
+            -var="region=${GCP_REGION}" \
+            -var="raw_bucket_name=${{ vars.ATMOSDATA_RAW_BUCKET_NAME }}"
