@@ -90,16 +90,22 @@ resource "google_project_iam_member" "function_bq" {
 
 resource "google_secret_manager_secret" "weather_api" {
   secret_id = "openweather-api-key"
+
   replication {
     auto {}
   }
+
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_secret_manager_secret" "gmail_password" {
   secret_id = "gmail-app-password"
+
   replication {
     auto {}
   }
+
+  depends_on = [google_project_service.apis]
 }
 
 resource "google_sql_database_instance" "mysql" {
