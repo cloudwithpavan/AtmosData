@@ -90,12 +90,16 @@ resource "google_project_iam_member" "function_bq" {
 
 resource "google_secret_manager_secret" "weather_api" {
   secret_id = "openweather-api-key"
-  replication { auto {} }
+  replication {
+    auto {}
+  }
 }
 
 resource "google_secret_manager_secret" "gmail_password" {
   secret_id = "gmail-app-password"
-  replication { auto {} }
+  replication {
+    auto {}
+  }
 }
 
 resource "google_sql_database_instance" "mysql" {
@@ -121,5 +125,5 @@ output "raw_bucket_name" {
 
 output "bronze_dataset" { value = google_bigquery_dataset.bronze.dataset_id }
 output "silver_dataset" { value = google_bigquery_dataset.silver.dataset_id }
-output "gold_dataset"   { value = google_bigquery_dataset.gold.dataset_id }
+output "gold_dataset" { value = google_bigquery_dataset.gold.dataset_id }
 output "function_service_account" { value = google_service_account.functions.email }
