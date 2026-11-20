@@ -1,18 +1,57 @@
-name: Terraform CD
+name: AtmosData Terraform CD
+
 on:
   workflow_dispatch:
+
 permissions:
   contents: read
   id-token: write
+
+env:
+  GCP_PROJECT_ID: my-project-77-511616
+  GCP_REGION: asia-south1
+
 jobs:
-  plan:
+  terraform-plan:
+    name: Terraform Plan
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: google-github-actions/auth@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
-      - uses: hashicorp/setup-terraform@v3
-      - run: terraform -chdir=terraform init
-      - run: terraform -chdir=terraform plan
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Verify Google Cloud authentication
+        run: |
+          gcloud auth list
+          gcloud config set project "${GCP_PROJECT_ID}"
+          gcloud projects describe "${GCP_PROJECT_ID}" \
+            --format="value(projectId)"
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format Check
+        run: terraform -chdir=terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform -chdir=terraform init
+
+      - name: Terraform Validate
+        run: terraform -chdir=terraform validate
+
+      - name: Terraform Plan
+        run: |
+          terraform -chdir=terraform plan \
+            -var="project_id=${GCP_PROJECT_ID}" \
+            -var="region=${GCP_REGION}"
