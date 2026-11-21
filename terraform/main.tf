@@ -166,12 +166,7 @@ resource "google_sql_database_instance" "mysql" {
 # MySQL database and application credentials - Phase 9
 # ---------------------------------------------------------
 
-resource "random_password" "mysql" {
-  count            = var.enable_cloud_sql ? 1 : 0
-  length           = 32
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
+
 
 resource "google_sql_database" "atmosdata_ops" {
   count    = var.enable_cloud_sql ? 1 : 0
@@ -183,8 +178,10 @@ resource "google_sql_user" "app" {
   count    = var.enable_cloud_sql ? 1 : 0
   name     = "atmosdata_app"
   instance = google_sql_database_instance.mysql[0].name
-  password = random_password.mysql[0].result
-  host     = "%"
+  lifecycle {
+    ignore_changes = [password]
+  }
+  host = "%"
 }
 
 resource "google_secret_manager_secret" "mysql_password" {
@@ -196,11 +193,7 @@ resource "google_secret_manager_secret" "mysql_password" {
   }
 }
 
-resource "google_secret_manager_secret_version" "mysql_password" {
-  count       = var.enable_cloud_sql ? 1 : 0
-  secret      = google_secret_manager_secret.mysql_password[0].id
-  secret_data = random_password.mysql[0].result
-}
+
 
 # Cloud SQL connection permission
 resource "google_project_iam_member" "functions_cloudsql_client" {
