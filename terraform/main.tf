@@ -412,3 +412,63 @@ output "composer_dag_bucket" {
 output "scheduler_job_name" {
   value = var.enable_composer ? google_cloud_scheduler_job.atmosdata_pipeline[0].name : null
 }
+
+# =========================================================
+# PHASE 11 - CLOUD MONITORING ALERTS
+# =========================================================
+
+resource "google_monitoring_notification_channel" "email" {
+  for_each = toset([
+    "pavankumargummadi77@gmail.com",
+    "jeevanmarygummadi@gmail.com"
+  ])
+
+  display_name = "AtmosData Alert - ${each.value}"
+  type         = "email"
+
+  labels = {
+    email_address = each.value
+  }
+}
+
+resource "google_monitoring_alert_policy" "cloud_run_errors" {
+  display_name = "AtmosData - Cloud Run HTTP 5xx Errors"
+  combiner     = "OR"
+  enabled      = true
+
+  conditions {
+    display_name = "Cloud Run HTTP 5xx responses"
+
+    condition_threshold {
+      filter = join(" AND ", [
+        "resource.type = \"cloud_run_revision\"",
+        "metric.type = \"run.googleapis.com/request_count\"",
+        "metric.labels.response_code_class = \"5xx\""
+      ])
+
+      duration        = "300s"
+      comparison      = "COMPARISON_GT"
+      threshold_value = 0
+
+      aggregations {
+        alignment_period   = "300s"
+        per_series_aligner = "ALIGN_RATE"
+      }
+
+      trigger {
+        count = 1
+      }
+    }
+  }
+
+  notification_channels = [
+    for channel in google_monitoring_notification_channel.email : channel.name
+  ]
+
+  documentation {
+    mime_type = "text/markdown"
+    content   = "AtmosData Cloud Run function returned HTTP 5xx responses. Check Cloud Run logs and ingestion execution."
+  }
+
+  depends_on = [google_project_service.apis]
+}
