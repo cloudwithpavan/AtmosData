@@ -2,7 +2,9 @@
 import json
 import logging
 import os
+import smtplib
 import uuid
+from email.message import EmailMessage
 from datetime import datetime, timezone
 from typing import Any
 
@@ -40,6 +42,45 @@ def get_secret(secret_name: str) -> str:
     name = f"projects/{PROJECT_ID}/secrets/{secret_name}/versions/latest"
     response = client.access_secret_version(request={"name": name})
     return response.payload.data.decode("utf-8").strip()
+
+
+def send_notification(subject: str, body: str) -> None:
+    """Send an email notification. Email failures must not fail ingestion."""
+
+    try:
+        sender = os.environ["GMAIL_SENDER"]
+        recipients = [
+            address.strip()
+            for address in os.environ["GMAIL_RECIPIENTS"].split(";")
+            if address.strip()
+        ]
+        gmail_secret = os.environ.get(
+            "GMAIL_SECRET_NAME",
+            "gmail-app-password",
+        )
+
+        if not recipients:
+            raise ValueError("No Gmail recipients configured.")
+
+        password = get_secret(gmail_secret)
+
+        message = EmailMessage()
+        message["Subject"] = subject
+        message["From"] = sender
+        message["To"] = ", ".join(recipients)
+        message.set_content(body)
+
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.ehlo()
+            smtp.login(sender, password)
+            smtp.send_message(message)
+
+        logging.info("Email notification sent to %s", recipients)
+
+    except Exception:
+        logging.exception("Gmail notification failed")
 
 
 def fetch_weather(city: dict[str, Any], api_key: str) -> dict[str, Any]:
@@ -242,6 +283,32 @@ def ingest_weather(request):
                 run_id,
             )
 
+        if failures:
+            subject = f"AtmosData - Partial Weather Ingestion - {len(failures)} failures"
+            body = (
+                f"AtmosData weather ingestion completed with partial failures.\n\n"
+                f"Run ID: {run_id}\n"
+                f"Successful cities: {len(results)}\n"
+                f"Failed cities: {len(failures)}\n"
+                f"GCS object: gs://{BUCKET_NAME}/{object_name}\n\n"
+                f"Failure details:\n"
+                + "\n".join(
+                    f"- {failure['city']}: {failure['error']}"
+                    for failure in failures
+                )
+            )
+        else:
+            subject = "AtmosData - Weather Ingestion Successful"
+            body = (
+                "AtmosData weather ingestion completed successfully.\n\n"
+                f"Run ID: {run_id}\n"
+                f"Successful cities: {len(results)}\n"
+                f"Failed cities: 0\n"
+                f"GCS object: gs://{BUCKET_NAME}/{object_name}\n"
+            )
+
+        send_notification(subject, body)
+
         status_code = 207 if failures else 200
 
         return (
@@ -255,8 +322,18 @@ def ingest_weather(request):
             status_code,
         )
 
-    except Exception:
+    except Exception as exc:
         logging.exception("Weather ingestion failed")
+
+        send_notification(
+            "AtmosData - Weather Ingestion FAILED",
+            (
+                f"Weather ingestion failed.\n\n"
+                f"Run ID: {run_id}\n"
+                f"Error: {str(exc)[:4000]}\n"
+                "Inspect Cloud Logging for the complete traceback."
+            ),
+        )
 
         return (
             {

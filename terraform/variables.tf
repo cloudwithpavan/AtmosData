@@ -16,11 +16,21 @@ variable "raw_bucket_name" {
 variable "enable_cloud_sql" {
   type        = bool
   default     = false
-  description = "Cloud SQL costs money while provisioned. Enable only after cost review."
+  description = "Cloud SQL costs money while provisioned."
 }
 
 variable "enable_composer" {
   type        = bool
   default     = false
-  description = "Composer is expensive. Enable only after local DAG development and cost review."
+  description = "Enable Cloud Composer after cost review."
+}
+
+variable "composer_environment_name" {
+  type    = string
+  default = "atmosdata-composer-dev"
+}
+
+variable "scheduler_timezone" {
+  type    = string
+  default = "Asia/Kolkata"
 }
