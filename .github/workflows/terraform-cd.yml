@@ -1,4 +1,5 @@
-﻿name: AtmosData Terraform CD
+﻿
+name: AtmosData Terraform CD
 
 on:
   workflow_dispatch:
@@ -65,26 +66,61 @@ jobs:
             -var="region=${GCP_REGION}" \
             -var="raw_bucket_name=${{ vars.ATMOSDATA_RAW_BUCKET_NAME }}" \
             -var="enable_cloud_sql=true" \
-            -var="enable_composer=true"
+            -var="enable_composer=false"
 
       - name: Block unexpected resource deletions
         run: |
           terraform -chdir=terraform show -json tfplan > terraform/tfplan.json
 
-          DELETIONS=$(jq -r '
+          ALLOWED='[
+            "google_cloud_scheduler_job.atmosdata_pipeline[0]",
+            "google_composer_environment.atmosdata[0]",
+            "google_project_iam_custom_role.scheduler_composer_trigger[0]",
+            "google_project_iam_member.composer_bq_data[0]",
+            "google_project_iam_member.composer_bq_job[0]",
+            "google_project_iam_member.composer_run_invoker[0]",
+            "google_project_iam_member.composer_worker[0]",
+            "google_project_iam_member.scheduler_composer_access[0]",
+            "google_project_iam_member.scheduler_composer_trigger[0]",
+            "google_service_account.composer[0]",
+            "google_service_account.scheduler[0]"
+          ]'
+
+                    UNEXPECTED=$(jq -r --argjson allowed "$ALLOWED" '
             .resource_changes[]?
+            | .address as $address
             | select(.change.actions | index("delete"))
-            | "\(.address): \(.change.actions | join(","))"
+            | select(
+                .change.actions != ["delete"]
+                or (($allowed | index($address)) == null)
+              )
+            | "\($address): \(.change.actions | join(","))"
           ' terraform/tfplan.json)
 
-          if [ -n "$DELETIONS" ]; then
-            echo "ERROR: Terraform plan contains resource deletions."
-            echo "$DELETIONS"
-            echo "Deployment blocked. Review the plan before proceeding."
+          if [ -n "$UNEXPECTED" ]; then
+            echo "ERROR: Unexpected deletion or replacement detected."
+            echo "$UNEXPECTED"
+            echo "Deployment blocked."
             exit 1
           fi
 
-          echo "Safety check passed: no resource deletions detected."
+          COMPOSER_DELETE=$(jq -r '
+            .resource_changes[]?
+            | select(
+                .address == "google_composer_environment.atmosdata[0]"
+                and .change.actions == ["delete"]
+              )
+            | .address
+          ' terraform/tfplan.json)
+
+          if [ -z "$COMPOSER_DELETE" ]; then
+            echo "ERROR: Expected Composer environment deletion not found."
+            echo "Deployment blocked."
+            exit 1
+          fi
+
+          echo "Safety check passed."
+          echo "Only explicitly allowed Composer/Scheduler deletions are permitted."
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
@@ -105,28 +141,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v4
-        with:
-          name: atmosdata-terraform-plan
-          path: terraform/
-
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.GCP_PROJECT_ID }}
-
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform -chdir=terraform init -input=false
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: atmosdata-terraform-plan
+          path: terraform
 
       - name: Terraform Apply Approved Plan
         run: terraform -chdir=terraform apply -input=false tfplan
