@@ -1,4 +1,4 @@
-name: AtmosData Terraform CD
+﻿name: AtmosData Terraform CD
 
 on:
   workflow_dispatch:
@@ -65,7 +65,7 @@ jobs:
             -var="region=${GCP_REGION}" \
             -var="raw_bucket_name=${{ vars.ATMOSDATA_RAW_BUCKET_NAME }}" \
             -var="enable_cloud_sql=true" \
-            -var="enable_composer=false"
+            -var="enable_composer=true"
 
       - name: Block unexpected resource deletions
         run: |
