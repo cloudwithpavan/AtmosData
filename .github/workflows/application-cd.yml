@@ -1,4 +1,3 @@
-
 name: Application CD
 
 on:
@@ -11,15 +10,16 @@ permissions:
 env:
   GCP_PROJECT_ID: my-project-77-511616
   GCP_REGION: asia-south1
-
   RUNTIME_SERVICE_ACCOUNT: atmosdata-functions@my-project-77-511616.iam.gserviceaccount.com
   EVENTARC_TRIGGER_SERVICE_ACCOUNT: atmosdata-eventarc-trigger@my-project-77-511616.iam.gserviceaccount.com
-
   RAW_BUCKET_NAME: weatherpulse-raw-dev-802327721598
   OPENWEATHER_SECRET_NAME: openweather-api-key
-
   BRONZE_DATASET: weather_bronze_dev
   BRONZE_TABLE: weather_observations
+  SQL_INSTANCE_CONNECTION_NAME: my-project-77-511616:asia-south1:atmosdata-mysql-dev
+  MYSQL_DATABASE: atmosdata_ops
+  MYSQL_USER: atmosdata_app
+  MYSQL_PASSWORD_SECRET_NAME: atmosdata-mysql-password
 
 jobs:
   deploy-weather-ingestion:
@@ -51,7 +51,7 @@ jobs:
             --trigger-http \
             --no-allow-unauthenticated \
             --service-account="$RUNTIME_SERVICE_ACCOUNT" \
-            --set-env-vars="GCP_PROJECT_ID=$GCP_PROJECT_ID,RAW_BUCKET_NAME=$RAW_BUCKET_NAME,OPENWEATHER_SECRET_NAME=$OPENWEATHER_SECRET_NAME" \
+            --set-env-vars="GCP_PROJECT_ID=$GCP_PROJECT_ID,RAW_BUCKET_NAME=$RAW_BUCKET_NAME,OPENWEATHER_SECRET_NAME=$OPENWEATHER_SECRET_NAME,SQL_INSTANCE_CONNECTION_NAME=$SQL_INSTANCE_CONNECTION_NAME,MYSQL_DATABASE=$MYSQL_DATABASE,MYSQL_USER=$MYSQL_USER,MYSQL_PASSWORD_SECRET_NAME=$MYSQL_PASSWORD_SECRET_NAME" \
             --memory=256MiB \
             --timeout=120s \
             --max-instances=3 \
