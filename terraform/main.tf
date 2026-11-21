@@ -131,7 +131,6 @@ resource "google_secret_manager_secret" "gmail_password" {
   depends_on = [google_project_service.apis]
 }
 
-
 # ---------------------------------------------------------
 # Optional Cloud SQL MySQL - Phase 9
 # ---------------------------------------------------------
@@ -166,8 +165,6 @@ resource "google_sql_database_instance" "mysql" {
 # MySQL database and application credentials - Phase 9
 # ---------------------------------------------------------
 
-
-
 resource "google_sql_database" "atmosdata_ops" {
   count    = var.enable_cloud_sql ? 1 : 0
   name     = "atmosdata_ops"
@@ -178,9 +175,11 @@ resource "google_sql_user" "app" {
   count    = var.enable_cloud_sql ? 1 : 0
   name     = "atmosdata_app"
   instance = google_sql_database_instance.mysql[0].name
+
   lifecycle {
     ignore_changes = [password]
   }
+
   host = "%"
 }
 
@@ -193,9 +192,8 @@ resource "google_secret_manager_secret" "mysql_password" {
   }
 }
 
-
-
 # Cloud SQL connection permission
+
 resource "google_project_iam_member" "functions_cloudsql_client" {
   count   = var.enable_cloud_sql ? 1 : 0
   project = var.project_id
@@ -204,6 +202,7 @@ resource "google_project_iam_member" "functions_cloudsql_client" {
 }
 
 # MySQL password access permission
+
 resource "google_secret_manager_secret_iam_member" "mysql_password_accessor" {
   count     = var.enable_cloud_sql ? 1 : 0
   project   = var.project_id
@@ -211,7 +210,6 @@ resource "google_secret_manager_secret_iam_member" "mysql_password_accessor" {
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.functions.email}"
 }
-
 
 # =========================================================
 # PHASE 6 - CLOUD COMPOSER 3 / AIRFLOW
@@ -330,6 +328,33 @@ resource "google_project_iam_member" "scheduler_composer_access" {
   member  = "serviceAccount:${google_service_account.scheduler[0].email}"
 }
 
+# Custom IAM role for executing Airflow commands
+
+resource "google_project_iam_custom_role" "scheduler_composer_trigger" {
+  count       = var.enable_composer ? 1 : 0
+  project     = var.project_id
+  role_id     = "atmosdataComposerTrigger"
+  title       = "AtmosData Composer DAG Trigger"
+  description = "Allows Cloud Scheduler to trigger Airflow commands"
+
+  permissions = [
+    "composer.environments.executeAirflowCommand"
+  ]
+
+  stage = "GA"
+}
+
+# Grant custom role to Cloud Scheduler service account
+
+resource "google_project_iam_member" "scheduler_composer_trigger" {
+  count   = var.enable_composer ? 1 : 0
+  project = var.project_id
+  role    = google_project_iam_custom_role.scheduler_composer_trigger[0].name
+  member  = "serviceAccount:${google_service_account.scheduler[0].email}"
+}
+
+# Cloud Scheduler - trigger DAG every 15 minutes
+
 resource "google_cloud_scheduler_job" "atmosdata_pipeline" {
   count       = var.enable_composer ? 1 : 0
   name        = "atmosdata-weather-pipeline-15min"
@@ -366,6 +391,7 @@ resource "google_cloud_scheduler_job" "atmosdata_pipeline" {
   depends_on = [
     google_project_service.apis,
     google_project_iam_member.scheduler_composer_access,
+    google_project_iam_member.scheduler_composer_trigger,
     google_composer_environment.atmosdata
   ]
 }

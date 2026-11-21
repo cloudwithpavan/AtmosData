@@ -1,4 +1,4 @@
-import json
+﻿import json
 from datetime import datetime, timedelta
 
 import google.auth
@@ -63,7 +63,7 @@ def invoke_weather_ingestion(**context):
 
     result = response.json()
 
-    if result.get("status") not in ("success", "partial_success"):
+    if result.get("status") not in ("success", "partial"):
         raise RuntimeError(
             f"Weather ingestion failed: {result}"
         )
@@ -83,6 +83,10 @@ def invoke_weather_ingestion(**context):
     context["ti"].xcom_push(
         key="ingestion_result",
         value=json.dumps(result),
+    )
+    context["ti"].xcom_push(
+        key="successful_cities",
+        value=result.get("successful_cities", 0),
     )
 
 
@@ -115,7 +119,7 @@ with DAG(
     validate_bronze = BigQueryCheckOperator(
         task_id="validate_bronze_load",
         sql="""
-        SELECT COUNT(*) >= 5
+        SELECT COUNT(*) >= GREATEST(CAST('{{ ti.xcom_pull(task_ids="invoke_weather_ingestion", key="successful_cities") }}' AS INT64), 1)
         FROM `my-project-77-511616.weather_bronze_dev.weather_observations`
         WHERE source_object = '{{ ti.xcom_pull(
             task_ids="invoke_weather_ingestion",

@@ -19,3 +19,10 @@ terraform/.terraform.lock.hcl
 .idea/
 service-account*.json
 credentials*.json
+
+# Local Terraform variables
+terraform/terraform.tfvars
+
+# Local tools and executables
+tools/
+tatus
