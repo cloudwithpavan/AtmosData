@@ -668,19 +668,7 @@ Project Repository: [AtmosData](https://github.com/cloudwithpavan/AtmosData)
 
 **Repository:** [github.com/cloudwithpavan/AtmosData](https://github.com/cloudwithpavan/AtmosData)
 
-*AtmosData — From weather API ingestion to analytical insights on Google Cloud.*
-<p align="center">
-  <strong>End-to-End GCP Data Engineering Project</strong><br>
-  Automated Weather Ingestion | Event-Driven Processing | BigQuery | Airflow | MySQL | Looker Studio
-</p>
-
-<p align="center">
-  ![GCP](https://img.shields.io/badge/Cloud-Google%20Cloud-blue?logo=googlecloud)
-  ![Python](https://img.shields.io/badge/Language-Python-3776AB?logo=python)
-  ![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?logo=terraform)
-  ![BigQuery](https://img.shields.io/badge/Warehouse-BigQuery-4285F4?logo=googlebigquery)
-  ![Airflow](https://img.shields.io/badge/Orchestration-Apache%20Airflow-017CEE?logo=apacheairflow)
-</p>
+*AtmosData — From https://openweathermap.org API ingestion to analytical insights on Google Cloud.*
 
 ---
 
