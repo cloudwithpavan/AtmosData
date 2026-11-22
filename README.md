@@ -1,6 +1,8 @@
-﻿<h1 align="center">🌦️ AtmosData</h1>
+﻿<h1 align="center">
+    🌦️ AtmosData</h1>
 
-<h1 align="center">Real-Time Weather Data Intelligence & Analytics Platform
+<h1 align="center">
+    Real-Time Weather Data Intelligence & Analytics Platform
 
 
 
