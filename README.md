@@ -594,11 +594,13 @@ flowchart TD
 
 ### Terraform deployment evidence
 
+![IAM Access Configuration](docs/outputs/approval%20Acess.png)
+
+
 ![Terraform GitHub Actions Deployment Success](docs/outputs/TerraformGitHub%20Actions%20deployment%20success.png)
 
-![Terraform Apply Evidence](docs/outputs/real%20logic%20apply.png)
 
-![IAM Access Configuration](docs/outputs/approval%20Acess.png)
+
 
 ---
 
