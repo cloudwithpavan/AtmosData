@@ -1,5 +1,5 @@
-﻿ <p align="center">
-  <img src="https://img.shields.io/badge/GOOGLE%20CLOUD-DATA%20ENGINEERING-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Google Cloud Data Engineering"/>
+﻿<p align="center">
+  <img src="https://img.shields.io/badge/GOOGLE%20CLOUD-END--TO--END%20DATA%20ENGINEERING-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Google Cloud Data Engineering"/>
 </p>
 
 <h1 align="center">🌦️ AtmosData</h1>
@@ -11,36 +11,55 @@
 </p>
 
 <p align="center">
-  An end-to-end cloud data engineering platform combining automated ingestion,<br/>
-  event-driven processing, data transformation, orchestration and business intelligence.
+  An end-to-end cloud data engineering platform featuring automated data ingestion,<br/>
+  event-driven processing, orchestration, analytical transformations and business intelligence.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Apache%20Airflow-017CEE?style=for-the-badge&logo=apacheairflow&logoColor=white"/>
-  <img src="https://img.shields.io/badge/BigQuery-669DF6?style=for-the-badge&logo=googlebigquery&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/Cloud%20Run%20Functions-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Cloud Run Functions"/>
+  <img src="https://img.shields.io/badge/Cloud%20Storage-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Cloud Storage"/>
+  <img src="https://img.shields.io/badge/BigQuery-669DF6?style=for-the-badge&logo=googlebigquery&logoColor=white" alt="BigQuery"/>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Eventarc-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white"/>
-  <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Looker%20Studio-4285F4?style=for-the-badge&logo=looker&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Eventarc-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Eventarc"/>
+  <img src="https://img.shields.io/badge/Pub%2FSub-AECBFA?style=for-the-badge&logo=googlecloud&logoColor=black" alt="Pub/Sub"/>
+  <img src="https://img.shields.io/badge/Cloud%20Scheduler-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Cloud Scheduler"/>
+  <img src="https://img.shields.io/badge/Cloud%20Composer-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Cloud Composer"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Apache%20Airflow-017CEE?style=for-the-badge&logo=apacheairflow&logoColor=white" alt="Apache Airflow"/>
+  <img src="https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white" alt="Terraform"/>
+  <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL"/>
+  <img src="https://img.shields.io/badge/Gmail%20SMTP-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail SMTP"/>
+  <img src="https://img.shields.io/badge/Cloud%20Monitoring-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Cloud Monitoring"/>
+  <img src="https://img.shields.io/badge/Looker%20Studio-4285F4?style=for-the-badge&logo=looker&logoColor=white" alt="Looker Studio"/>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/ARCHITECTURE-MEDALLION-0078D4?style=flat-square"/>
-  <img src="https://img.shields.io/badge/INGESTION-EVENT--DRIVEN-2E8B57?style=flat-square"/>
+  <img src="https://img.shields.io/badge/PROCESSING-EVENT--DRIVEN-2E8B57?style=flat-square"/>
   <img src="https://img.shields.io/badge/DEPLOYMENT-CI%2FCD-6F42C1?style=flat-square"/>
   <img src="https://img.shields.io/badge/INFRASTRUCTURE-AS%20CODE-BA55D3?style=flat-square"/>
 </p>
 
 <p align="center">
   <strong>5 Indian Cities</strong> &nbsp; • &nbsp;
-  <strong>15-Minute Collection Cycle</strong> &nbsp; • &nbsp;
-  <strong>3-Layer Data Warehouse</strong>
+  <strong>15-Minute Collection Cycle*</strong> &nbsp; • &nbsp;
+  <strong>Bronze → Silver → Gold</strong>
 </p>
+
+<p align="center">
+  <sub>*Scheduled execution is enabled when the on-demand Composer and Scheduler environment is provisioned.</sub>
+</p>
+
+---
 
 
 ---
