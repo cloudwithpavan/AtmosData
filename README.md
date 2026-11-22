@@ -1,32 +1,47 @@
-﻿<h1 align="center">
-    🌦️ AtmosData</h1>
+﻿ <p align="center">
+  <img src="https://img.shields.io/badge/GOOGLE%20CLOUD-DATA%20ENGINEERING-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Google Cloud Data Engineering"/>
+</p>
 
-<h1 align="center">
-    Real-Time Weather Data Intelligence & Analytics Platform
+<h1 align="center">🌦️ AtmosData</h1>
 
-
+<h3 align="center">Real-Time Weather Data Intelligence & Analytics Platform</h3>
 
 <p align="center">
-  <strong>An end-to-end Google Cloud data engineering project</strong><br/>
-  Automated ingestion · Event-driven processing · Medallion architecture · Apache Airflow · Terraform · BigQuery · MySQL · Looker Studio
+  <strong>From live weather ingestion to actionable analytics on Google Cloud</strong>
 </p>
 
 <p align="center">
-  <a href="https://cloud.google.com/"><img src="https://img.shields.io/badge/Google%20Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Google Cloud"/></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/></a>
-  <a href="https://www.terraform.io/"><img src="https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white" alt="Terraform"/></a>
-  <a href="https://airflow.apache.org/"><img src="https://img.shields.io/badge/Apache%20Airflow-017CEE?style=for-the-badge&logo=apacheairflow&logoColor=white" alt="Apache Airflow"/></a>
-  <a href="https://cloud.google.com/bigquery"><img src="https://img.shields.io/badge/BigQuery-669DF6?style=for-the-badge&logo=googlebigquery&logoColor=white" alt="BigQuery"/></a>
-  <a href="https://www.mysql.com/"><img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL"/></a>
-  <a href="https://lookerstudio.google.com/"><img src="https://img.shields.io/badge/Looker%20Studio-4285F4?style=for-the-badge&logo=looker&logoColor=white" alt="Looker Studio"/></a>
+  An end-to-end cloud data engineering platform combining automated ingestion,<br/>
+  event-driven processing, data transformation, orchestration and business intelligence.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Architecture-Medallion-blue?style=flat-square"/>
-  <img src="https://img.shields.io/badge/Ingestion-Event--Driven-success?style=flat-square"/>
-  <img src="https://img.shields.io/badge/Deployment-GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Infrastructure-as%20Code-7B42BC?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Apache%20Airflow-017CEE?style=for-the-badge&logo=apacheairflow&logoColor=white"/>
+  <img src="https://img.shields.io/badge/BigQuery-669DF6?style=for-the-badge&logo=googlebigquery&logoColor=white"/>
 </p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Eventarc-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white"/>
+  <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Looker%20Studio-4285F4?style=for-the-badge&logo=looker&logoColor=white"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/ARCHITECTURE-MEDALLION-0078D4?style=flat-square"/>
+  <img src="https://img.shields.io/badge/INGESTION-EVENT--DRIVEN-2E8B57?style=flat-square"/>
+  <img src="https://img.shields.io/badge/DEPLOYMENT-CI%2FCD-6F42C1?style=flat-square"/>
+  <img src="https://img.shields.io/badge/INFRASTRUCTURE-AS%20CODE-BA55D3?style=flat-square"/>
+</p>
+
+<p align="center">
+  <strong>5 Indian Cities</strong> &nbsp; • &nbsp;
+  <strong>15-Minute Collection Cycle</strong> &nbsp; • &nbsp;
+  <strong>3-Layer Data Warehouse</strong>
+</p>
+
 
 ---
 
